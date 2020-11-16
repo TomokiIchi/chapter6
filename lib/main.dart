@@ -1,5 +1,6 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter/rendering.dart';
 
 import 'dart:ui' as ui;
@@ -32,6 +33,11 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 255, 255, 255),
@@ -39,57 +45,34 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text('MY APP'),
       ),
       body: Center(
-        child: MyRenderBoxWidget(),
+        child: CustomPaint(
+          painter: MyPainter(),
+        ),
       ),
     );
   }
 }
 
-class MyRenderBoxWidget extends SingleChildRenderObjectWidget {
+class MyPainter extends CustomPainter {
   @override
-  RenderObject createRenderObject(BuildContext context) {
-    return _MyRenderBox();
-  }
-}
-
-class _MyRenderBox extends RenderBox {
-  ui.Image _img;
-
-  @override
-  bool hitTest(HitTestResult result, {@required Offset position}) {
-    return true;
-  }
-
-  @override
-  void paint(PaintingContext context, Offset offset) {
-    Canvas c = context.canvas;
-    int dx = offset.dx.toInt();
-    int dy = offset.dy.toInt();
-
-    if (_img != null) {
-      c.drawImage(_img, Offset(dx + 50.0, dy + 50.0), Paint());
-    }
-
+  void paint(Canvas canvas, Size size) {
     Paint p = Paint();
     p.style = PaintingStyle.fill;
-    p.blendMode = BlendMode.darken;
-
-    for (var i; i < 10; i++) {
-      for (var j; j < 10; j++) {
-        p.color = Color.fromARGB(255, 25 * i, 0, 25 * j);
-        Rect r = Rect.fromLTWH(dx + 30.0 * i, dy + 30 * j, 30, 30);
-        c.drawOval(r, p);
-      }
+    p.color = Colors.black;
+    print(size);
+    for (var i = 0; i < 100; i++) {
+      Random rnd = Random();
+      double w = rnd.nextInt(300).toDouble() - 150;
+      double h = rnd.nextInt(300).toDouble() - 150;
+      double cr = rnd.nextInt(50).toDouble();
+      int r = rnd.nextInt(255);
+      int g = rnd.nextInt(255);
+      int b = rnd.nextInt(255);
+      p.color = Color.fromARGB(50, r, g, b);
+      canvas.drawCircle(Offset(w, h), cr, p);
     }
-    c.save();
-
-    Rect r = Rect.fromLTWH(dx + 70.0, dy + 70.0, 130.0, 130.0);
-    c.clipRect(r);
-    c.drawColor(Color.fromARGB(255, 255, 0, 0), BlendMode.darken);
-    c.restore();
-    r = Rect.fromLTWH(dx + 200.0, dy + 200.0, 130.0, 130.0);
-    c.clipRect(r);
-    c.drawColor(Color.fromARGB(255, 0, 255, 0), BlendMode.darken);
-    c.restore();
   }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) => true;
 }
