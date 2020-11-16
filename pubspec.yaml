@@ -22,6 +22,8 @@ environment:
 
 dependencies:
   flutter:
+    assets:
+      - assets/image.jpg
     sdk: flutter
 
 
