@@ -32,6 +32,9 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  GlobalKey _homeStateKey = GlobalKey();
+  Offset _pos;
+
   @override
   void initState() {
     super.initState();
@@ -45,31 +48,51 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text('MY APP'),
       ),
       body: Center(
-        child: CustomPaint(
-          painter: MyPainter(),
+        child: Listener(
+          onPointerDown: _pointerDown,
+          onPointerMove: _pointerMove,
+          child: CustomPaint(
+            key: _homeStateKey,
+            painter: MyPainter(_pos),
+            child: ConstrainedBox(
+              constraints: BoxConstraints.expand(),
+            ),
+          ),
         ),
       ),
     );
   }
+
+  void _pointerDown(PointerDownEvent event) {
+    RenderBox referenceBox = _homeStateKey.currentContext.findRenderObject();
+    setState(() {
+      _pos = referenceBox.globalToLocal(event.position);
+    });
+  }
+
+  void _pointerMove(PointerMoveEvent event) {
+    RenderBox referenceBox = _homeStateKey.currentContext.findRenderObject();
+    setState(() {
+      _pos = referenceBox.globalToLocal(event.position);
+    });
+  }
 }
 
 class MyPainter extends CustomPainter {
+  Offset _pos;
+
+  MyPainter(this._pos);
+
   @override
   void paint(Canvas canvas, Size size) {
     Paint p = Paint();
     p.style = PaintingStyle.fill;
-    p.color = Colors.black;
-    print(size);
-    for (var i = 0; i < 100; i++) {
-      Random rnd = Random();
-      double w = rnd.nextInt(300).toDouble() - 150;
-      double h = rnd.nextInt(300).toDouble() - 150;
-      double cr = rnd.nextInt(50).toDouble();
-      int r = rnd.nextInt(255);
-      int g = rnd.nextInt(255);
-      int b = rnd.nextInt(255);
-      p.color = Color.fromARGB(50, r, g, b);
-      canvas.drawCircle(Offset(w, h), cr, p);
+    p.color = Color.fromARGB(25, 255, 0, 0);
+    if (_pos != null) {
+      for (var i = 0; i < 10; i++) {
+        canvas.drawCircle(_pos, 10.0 * i, p);
+      }
+      canvas.drawCircle(_pos, 50.0, p);
     }
   }
 
